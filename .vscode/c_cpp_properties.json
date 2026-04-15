@@ -1,0 +1,18 @@
+{
+    "configurations": [
+        {
+            "name": "STM32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/Users/anand/stm32_dev/CMSIS/Device/ST/STM32F4xx/Include",
+                "/Users/anand/stm32_dev/CMSIS/Include"
+            ],
+            "defines": [
+                "STM32F401xC"  // Tell the header exactly which chip you have
+            ],
+            "compilerPath": "/opt/homebrew/bin/arm-none-eabi-gcc", // Path to your toolchain
+            "intelliSenseMode": "gcc-arm"
+        }
+    ],
+    "version": 4
+}
