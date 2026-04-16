@@ -1,6 +1,6 @@
 /* STM32 has 32 bit wide regs -> each increment or decreament will move exactly one reg width in mem*/
 #include "os_kernel.h"
-
+#include "tasks.h"
 /* Max number of tasks */
 
 
@@ -78,28 +78,70 @@ bool os_task_create(void (*taskptr)(void), uint32_t *stackLimit, uint8_t priorit
 
 void os_scheduler(void)
 {
-    /* We start by looking at the next task in the CLL */
-    TCB_t *next_task = current_tcb->next;
+    /* Initialize with NULL or a very low priority baseline */
+    TCB_t* best_task = NULL; 
+    uint8_t highest_prior = 0;
 
-    /* We have to skip over any tasks which are not in the READY state -> use a do-while*/
-    do
+    /* Search for the highest priority READY task */
+    for (int i = 0; i < task_count; i++)
     {
-        if(next_task->state == READY)
+        /* Use . because os_tasks[i] is the struct itself */
+        if(os_tasks[i].state == READY)
         {
-            /* We wanna round robin to this one since it is ready to work*/
-            current_tcb = next_task;
-            return;
+            /* If it's the first READY task found, or higher priority than the last */
+            if (best_task == NULL || os_tasks[i].priority >= highest_prior)
+            {
+                highest_prior = os_tasks[i].priority;
+                best_task = &os_tasks[i]; /* Use & to get the pointer to this task */
+            }
         }
-        next_task = next_task->next;
-    } while (next_task != current_tcb->next);
-    
-    /* If we get here it means no tasks were ready so do idling task */
+    }
+
+    /* If we found a READY task, switch to it. 
+       If no tasks were READY, the CPU stays on the previous task 
+ */
+    if(best_task != NULL) {
+        current_tcb = best_task;
+    }
+}
+void SysTick_Handler(void) {
+    uint8_t switch_needed = 0;
+
+    /* 1. Loop through all tasks to update sleep timers */
+    for (int i = 0; i < task_count; i++) {
+        if (os_tasks[i].sleep_time > 0) {
+            os_tasks[i].sleep_time--;
+            
+            /* 2. If timer just hit zero, wake it up! */
+            if (os_tasks[i].sleep_time == 0) {
+                os_tasks[i].state = READY;
+                
+                /* 3. Preemption Check: Is this newly awake task higher priority 
+                   than the one we are currently running? */
+                if (os_tasks[i].priority > current_tcb->priority) {
+                    switch_needed = 1;
+                }
+            }
+        }
+    }
+
+    /* 4. If a higher priority task is now READY, trigger PendSV */
+    if (switch_needed) {
+        SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk; 
+    }
 }
 
-void SysTick_Handler(void)
+void os_delay(uint32_t ms)
 {
-    os_scheduler(); /* Decide who to take on next */
+    __disable_irq(); /* Start of the critical section */
+    current_tcb->sleep_time = ms;
+    current_tcb->state = BLOCKED;
 
-    /* Push the "Request PendSV" button in the CPU */
+    __enable_irq(); /* end of the critical section */
+
+    /* Trigger a Context Switch now */
+    /* We do this since, if we dont the task will continue running in its "remaining time slice - 1ms" even though it has nothing to do
+    and the CPU will essentially idle inside the OD code instead of doing other useful tasks 
+    So by calling this we tell the hardware that this task is finished for now please swap it out for the next READY task*/
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 }

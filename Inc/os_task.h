@@ -22,6 +22,7 @@ typedef struct
     uint32_t stackSize; /* Size of the stack in words */
     uint32_t timeout; /* USe for os-delay */
     struct TCB_t *next; /* ptr to the next task in the circle */
+    uint32_t sleep_time; /* Time remaining in sleep (ms) */
 } TCB_t;
 
 #endif
