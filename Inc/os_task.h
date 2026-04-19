@@ -13,7 +13,7 @@ typedef enum
 } TaskState_t;
 
 /* Task Control Block (TCB) */
-typedef struct 
+typedef struct TCB
 {
     /* data */
     uint32_t *stackPtr; /* Current stack ptr (has to be first since required in the assembly) */
@@ -21,7 +21,7 @@ typedef struct
     uint8_t priority; /* Task priority (0 being highest) */
     uint32_t stackSize; /* Size of the stack in words */
     uint32_t timeout; /* USe for os-delay */
-    struct TCB_t *next; /* ptr to the next task in the circle */
+    struct TCB *next; /* ptr to the next task in the circle */
     uint32_t sleep_time; /* Time remaining in sleep (ms) */
 } TCB_t;
 

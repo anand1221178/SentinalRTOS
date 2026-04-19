@@ -11,6 +11,13 @@
 #define STACK_SIZE   256    /* Stack size in 32-bit words (1024 bytes) */
 #define SYSTICK_FREQ 1000   /* 1kHz Tick (1ms) */
 
+#define ST_ENABLE (1U<<0) /* Turn on counter */
+#define ST_TICKINT (1U<<1) /* Enable systick interuppt */
+#define ST_CLKSOURCE (1U<<2) /* Use the proc clock */
+
+#define SYSTICK_CTRL_CONFIG  (ST_ENABLE | ST_TICKINT | ST_CLKSOURCE)
+
+
 /* --- Public Kernel API --- */
 
 /**
@@ -20,9 +27,15 @@ void os_kernel_init(void);
 
 /**
  * @brief Launches the first task. This function never returns.
- * Written in Assembly (os_kernel_asm.s).
+ * Implementation in os_kernel.c, calls os_start_first_task.
  */
 void os_kernel_launch(void);
+
+/**
+ * @brief Actual assembly implementation to switch to PSP and start tasks.
+ * Defined in os_kernel_asm.s.
+ */
+void os_start_first_task(void);
 
 /**
  * @brief Registers a new task into the circular linked list.
@@ -33,9 +46,25 @@ void os_kernel_launch(void);
  */
 bool os_task_create(void (*taskptr)(void), uint32_t *stackLimit, uint8_t priority);
 
+#define MAX_WAITING_TASKS 5
+
+typedef struct 
+{
+    uint32_t lock; /* 0 = unlocked 1 = locked */
+    TCB_t* owner; /* The task currently holding the lock */
+    TCB_t* wait_queue[MAX_WAITING_TASKS]; /* Array for the waiting tasks for the lock */
+    uint8_t wait_count; /* How many tasks are currently waiting? */
+} os_mutex_t;
+
 /**
  * @brief The Round-Robin decision maker. Called by SysTick_Handler.
  */
 void os_scheduler(void);
+
+void os_mutex_acquire(os_mutex_t* mutex);
+
+void os_mutex_release(os_mutex_t* mutex);
+
+void os_delay(uint32_t ms);
 
 #endif /* OS_KERNEL_H */

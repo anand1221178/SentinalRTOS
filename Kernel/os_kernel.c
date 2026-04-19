@@ -1,6 +1,7 @@
 /* STM32 has 32 bit wide regs -> each increment or decreament will move exactly one reg width in mem*/
 #include "os_kernel.h"
 #include "tasks.h"
+#include "lock.h"
 /* Max number of tasks */
 
 
@@ -144,4 +145,84 @@ void os_delay(uint32_t ms)
     and the CPU will essentially idle inside the OD code instead of doing other useful tasks 
     So by calling this we tell the hardware that this task is finished for now please swap it out for the next READY task*/
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+}
+
+void os_kernel_init(void)
+{
+    __disable_irq(); /* We dont want anything interfering with this! */
+    task_count = 0; /* Clear the task list and everything we have */
+    current_tcb = NULL; /* There should be no tasks running yet! */
+}
+
+void os_kernel_launch(void)
+{
+    /* Configure our systick for 1ms interrupts with 16mhz clock */
+    SysTick->LOAD = 15999;
+    SysTick->VAL = 0;
+
+    /* Enable internal clock */
+    SysTick->CTRL = SYSTICK_CTRL_CONFIG;
+
+    /* Set Pendsv to lowest priority so it doesnt interrupt hardware timing */
+    SCB->SHP[10] = 0xFF;
+
+    os_start_first_task(); 
+}
+
+void os_mutex_acquire(os_mutex_t* mutex)
+{
+    __disable_irq(); /* We wanna protect the check */
+
+    if(mutex->lock == 0) /* not taken -> free */
+    {
+        mutex->lock = 1; /* Set the lock to locked */
+        mutex->owner = current_tcb;
+        __enable_irq(); /* Renable interrupts */
+    }
+    else
+    {
+        /* If the lock is in use change the task requesting the lock to blocked  */
+        current_tcb->state = BLOCKED;
+
+        /* Add current_tcb to mutex->wait_queue */
+        mutex->wait_queue[mutex->wait_count] = current_tcb;
+        mutex->wait_count += 1;
+
+        __enable_irq();
+
+        // Trigger a switch so another task can run
+        SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+    }
+}
+
+void os_mutex_release(os_mutex_t* mutex)
+{
+    __disable_irq();
+
+    if(mutex->wait_count > 0)/* multiple tasks waiting for the lock */
+    {
+        /* Direct Handoff: */
+        /* Hand voer the ownership and wake the task */
+        mutex->owner = mutex->wait_queue[0];
+        mutex->owner->state = READY;
+
+        /* Need to shift the queue forward */
+        for (int i = 0; i < mutex->wait_count - 1; i++)
+        {
+            mutex->wait_queue[i] = mutex->wait_queue[i+1];
+        }
+        mutex->wait_count--;
+
+        __enable_irq();
+        /* GEt the CPU to CS */
+        SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+    }
+    else
+    {
+        /* Else no task ware waiting */
+        mutex->lock = 0;
+        mutex->owner = NULL;
+    }
+
+
 }
