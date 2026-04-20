@@ -25,6 +25,9 @@ int main(void)
     uart_init();
     uart_print("---SENTINEL RTOS BOOTING---\r\n");
 
+    /* Run Power-On Self-Tests */
+    os_run_post();
+
     /* Setup tasks */
     os_task_create(task1, &task1_stack[0], 1);
     os_task_create(task2, &task2_stack[0], 1); /* Same priority */

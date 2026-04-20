@@ -18,6 +18,27 @@
 #define SYSTICK_CTRL_CONFIG  (ST_ENABLE | ST_TICKINT | ST_CLKSOURCE)
 
 
+/* --- Synchronization Primitives Definitions --- */
+
+#define MAX_WAITING_TASKS 5
+
+typedef struct 
+{
+    uint32_t lock; /* 0 = unlocked 1 = locked */
+    TCB_t* owner; /* The task currently holding the lock */
+    TCB_t* wait_queue[MAX_WAITING_TASKS]; /* Array for the waiting tasks for the lock */
+    uint8_t wait_count; /* How many tasks are currently waiting? */
+} os_mutex_t;
+
+typedef struct os_semaphore
+{
+    uint32_t count; /* Current number of avaliable tokens */
+    uint32_t max_count; /* 1 for Binary, >1 for Counting */
+    TCB_t* wait_queue[MAX_TASKS]; 
+    uint8_t wait_count;
+} os_semaphore_t;
+
+
 /* --- Public Kernel API --- */
 
 /**
@@ -52,25 +73,25 @@ void PendSV_Handler(void);
  */
 bool os_task_create(void (*taskptr)(void), uint32_t *stackLimit, uint8_t priority);
 
-#define MAX_WAITING_TASKS 5
-
-typedef struct 
-{
-    uint32_t lock; /* 0 = unlocked 1 = locked */
-    TCB_t* owner; /* The task currently holding the lock */
-    TCB_t* wait_queue[MAX_WAITING_TASKS]; /* Array for the waiting tasks for the lock */
-    uint8_t wait_count; /* How many tasks are currently waiting? */
-} os_mutex_t;
-
 /**
  * @brief The Round-Robin decision maker. Called by SysTick_Handler.
  */
 void os_scheduler(void);
 
+/* Mutex API */
 void os_mutex_acquire(os_mutex_t* mutex);
-
 void os_mutex_release(os_mutex_t* mutex);
 
+/* Semaphore API */
+void os_semaphore_acquire(os_semaphore_t* sem);
+void os_semaphore_release(os_semaphore_t* sem);
+
 void os_delay(uint32_t ms);
+
+/**
+ * @brief Runs Power-On Self-Tests for Kernel Primitives.
+ * Should be called after UART init but before os_kernel_launch.
+ */
+void os_run_post(void);
 
 #endif /* OS_KERNEL_H */

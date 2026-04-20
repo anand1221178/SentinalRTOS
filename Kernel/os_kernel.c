@@ -51,7 +51,7 @@ bool os_task_create(void (*taskptr)(void), uint32_t *stackLimit, uint8_t priorit
     TCB_t *new_tcb = &os_tasks[task_count];
 
     /* Setting basic TCB info */
-    new_tcb->priority = priority;
+    new_tcb->base_priority = priority;
     new_tcb->state = READY;
 
     /* We now need to initialise our stack -> we know the stack size is 256 words*/
@@ -90,9 +90,9 @@ void os_scheduler(void)
         if(os_tasks[i].state == READY)
         {
             /* If it's the first READY task found, or higher priority than the last */
-            if (best_task == NULL || os_tasks[i].priority >= highest_prior)
+            if (best_task == NULL || os_tasks[i].base_priority >= highest_prior)
             {
-                highest_prior = os_tasks[i].priority;
+                highest_prior = os_tasks[i].base_priority;
                 best_task = &os_tasks[i]; /* Use & to get the pointer to this task */
             }
         }
@@ -119,7 +119,7 @@ void SysTick_Handler(void) {
                 
                 /* 3. Preemption Check: Is this newly awake task higher priority 
                    than the one we are currently running? */
-                if (os_tasks[i].priority > current_tcb->priority) {
+                if (os_tasks[i].base_priority > current_tcb->base_priority) {
                     switch_needed = 1;
                 }
             }
@@ -181,16 +181,19 @@ void os_mutex_acquire(os_mutex_t* mutex)
     }
     else
     {
-        /* If the lock is in use change the task requesting the lock to blocked  */
-        current_tcb->state = BLOCKED;
+        /* Priority inheritance implemenation now */
+        /* If i am more important then the task holding the lock then boost that tasks priority to match mines */
+        if(current_tcb->current_priority > mutex->owner->current_priority)
+        {
+            mutex->owner->current_priority = current_tcb->current_priority;
+        }
 
-        /* Add current_tcb to mutex->wait_queue */
+        /* Standard Blocking Logic */
+        current_tcb->state = BLOCKED;
         mutex->wait_queue[mutex->wait_count] = current_tcb;
         mutex->wait_count += 1;
-
         __enable_irq();
 
-        // Trigger a switch so another task can run
         SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
     }
 }
@@ -198,6 +201,10 @@ void os_mutex_acquire(os_mutex_t* mutex)
 void os_mutex_release(os_mutex_t* mutex)
 {
     __disable_irq();
+
+    /* Restore Priority*/
+    /* I am done with the lock, drop my priority back to normal */
+    current_tcb->current_priority = current_tcb->base_priority;
 
     if(mutex->wait_count > 0)/* multiple tasks waiting for the lock */
     {
@@ -225,4 +232,57 @@ void os_mutex_release(os_mutex_t* mutex)
     }
 
 
+}
+
+void os_semaphore_acquire(os_semaphore_t* sem)
+{
+    __disable_irq();
+
+    if(sem->count > 0)
+    {
+        /* Tokens available Take one and keep running. */
+        sem->count--;
+        __enable_irq();
+    }
+    else
+    {
+        /* No tokens Go to sleep and wait in line. */
+        current_tcb->state = BLOCKED;
+        sem->wait_queue[sem->wait_count] = current_tcb;
+        sem->wait_count++;
+        
+        __enable_irq();
+        SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk; /* Context Switch */
+    }
+}
+
+void os_semaphore_release(os_semaphore_t* sem)
+{
+    __disable_irq();
+
+    if (sem->wait_count > 0)
+    {
+        /* Someone is waiting Wake up the first task in line. */
+        TCB_t* next_task = sem->wait_queue[0];
+        next_task->state = READY;
+
+        /* Shift the queue forward */
+        for (int i = 0; i < sem->wait_count - 1; i++) 
+        {
+            sem->wait_queue[i] = sem->wait_queue[i + 1];
+        }
+        sem->wait_count--;
+
+        __enable_irq();
+        SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk; /* Let scheduler evaluate the newly awoken task */
+    }
+    else
+    {
+        /* No one is waiting. Just increment the count up to the max. */
+        if (sem->count < sem->max_count)
+        {
+            sem->count++;
+        }
+        __enable_irq();
+    }
 }
