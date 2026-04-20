@@ -6,6 +6,7 @@ CFLAGS = -c -mcpu=cortex-m4 -mthumb -std=gnu11 -DSTM32F411xE -g -O0
 INCLUDES = -IInc \
            -ITasks \
            -IKernel \
+           -IDrivers/Inc \
            -I/Users/anand/stm32_dev/CMSIS/Include \
            -I/Users/anand/stm32_dev/CMSIS/Device/ST/STM32F4xx/Include
 
@@ -13,7 +14,11 @@ INCLUDES = -IInc \
 all: all.elf
 
 # Rule for main.o
-main.o: Src/main.c Inc/os_kernel.h Tasks/tasks.h Inc/lock.h
+main.o: Src/main.c Inc/os_kernel.h Tasks/tasks.h Inc/lock.h Drivers/Inc/uart.h
+	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@
+
+# Rule for UART driver
+uart.o: Drivers/Src/uart.c Drivers/Inc/uart.h
 	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@
 
 # Rule for kernel C code
@@ -34,7 +39,7 @@ stm32f411_startup.o: stm32f411_startup.c
 
 # Linking everything together
 # Using $^ automatically inserts all the prerequisites (the .o files)
-all.elf: main.o os_kernel.o os_kernel_asm.o tasks.o stm32f411_startup.o
+all.elf: main.o os_kernel.o os_kernel_asm.o tasks.o stm32f411_startup.o uart.o
 	$(CC) -nostartfiles -T stm32_ls.ld $^ -o $@ --specs=nano.specs --specs=nosys.specs -Wl,-Map=all.map
 
 flash:

@@ -38,6 +38,12 @@ void os_kernel_launch(void);
 void os_start_first_task(void);
 
 /**
+ * @brief Context switch handler. Performs saving and restoring of task context.
+ * Defined in os_kernel_asm.s.
+ */
+void PendSV_Handler(void);
+
+/**
  * @brief Registers a new task into the circular linked list.
  * @param taskptr    Function pointer to the task code.
  * @param stackLimit Pointer to the START of the static stack array.
