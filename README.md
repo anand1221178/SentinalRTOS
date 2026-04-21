@@ -20,6 +20,11 @@ MicroBench measures the cycle-accurate overhead of kernel operations.
 --- SENTINEL MICROBENCH START ---
 [Bench] Mutex overhead:94 cycles(5 us)
 --- BENCHMARK COMPLETE ---
+
+Changed compiler flag from -O0 to -O2 and got:
+--- --- SENTINEL MICROBENCH START ---
+[Bench] Mutex overhead:42 cycles(2 us)
+--- BENCHMARK COMPLETE ---
 ```
 
 *Note: Results obtained on STM32F411 running at 16MHz.*

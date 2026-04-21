@@ -1,7 +1,7 @@
 # --- Variables ---
 CC = arm-none-eabi-gcc
 MACH = cortex-m4
-CFLAGS = -c -mcpu=$(MACH) -mthumb -std=gnu11 -DSTM32F411xE -g -O0
+CFLAGS = -c -mcpu=$(MACH) -mthumb -std=gnu11 -DSTM32F411xE -g -O2
 LDFLAGS = -mcpu=$(MACH) -mthumb -nostartfiles -T stm32_ls.ld --specs=nano.specs --specs=nosys.specs -Wl,-Map=all.map
 
 # Updated Includes
