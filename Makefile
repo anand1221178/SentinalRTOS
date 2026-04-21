@@ -9,13 +9,14 @@ INCLUDES = -IInc \
            -ITasks \
            -IKernel \
            -IDrivers/Inc \
+           -IBench \
            -I/Users/anand/stm32_dev/CMSIS/Include \
            -I/Users/anand/stm32_dev/CMSIS/Device/ST/STM32F4xx/Include
 
 # --- Build Rules ---
 all: all.elf
 
-main.o: Src/main.c Inc/os_kernel.h Tasks/tasks.h Inc/lock.h Drivers/Inc/uart.h
+main.o: Src/main.c Inc/os_kernel.h Tasks/tasks.h Inc/lock.h Drivers/Inc/uart.h Bench/microbench.h
 	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@
 
 uart.o: Drivers/Src/uart.c Drivers/Inc/uart.h
@@ -36,7 +37,10 @@ tasks.o: Tasks/tasks.c Tasks/tasks.h Inc/os_kernel.h
 stm32f411_startup.o: stm32f411_startup.c
 	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@
 
-all.elf: main.o os_kernel.o os_kernel_asm.o os_tests.o tasks.o stm32f411_startup.o uart.o
+microbench.o: Bench/microbench.c Bench/microbench.h Inc/os_kernel.h Drivers/Inc/uart.h
+	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@
+
+all.elf: main.o os_kernel.o os_kernel_asm.o os_tests.o tasks.o stm32f411_startup.o uart.o microbench.o
 	$(CC) $(LDFLAGS) $^ -o $@
 
 flash:
