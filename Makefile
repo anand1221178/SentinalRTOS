@@ -31,6 +31,9 @@ os_kernel.o: Kernel/os_kernel.c Inc/os_kernel.h Inc/lock.h
 os_tests.o: Kernel/os_tests.c Inc/os_kernel.h Drivers/Inc/uart.h
 	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@
 
+os_queue.o: Kernel/os_queue.c Inc/os_queue.h Inc/os_kernel.h
+	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@
+
 os_kernel_asm.o: Kernel/os_kernel_asm.s
 	$(CC) $(CFLAGS) $< -o $@
 
@@ -43,7 +46,7 @@ stm32f411_startup.o: stm32f411_startup.c
 microbench.o: Bench/microbench.c Bench/microbench.h Inc/os_kernel.h Drivers/Inc/uart.h
 	$(CC) $(CFLAGS) $(INCLUDES) $< -o $@
 
-all.elf: main.o os_kernel.o os_kernel_asm.o os_tests.o tasks.o stm32f411_startup.o uart.o microbench.o servo.o
+all.elf: main.o os_kernel.o os_kernel_asm.o os_tests.o os_queue.o tasks.o stm32f411_startup.o uart.o microbench.o servo.o
 	$(CC) $(LDFLAGS) $^ -o $@
 
 flash:

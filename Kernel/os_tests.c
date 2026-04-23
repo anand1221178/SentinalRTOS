@@ -53,11 +53,34 @@ static void test_semaphore_basic(void) {
     uart_print("PASS\r\n");
 }
 
+#include "os_queue.h"
+
+static void test_queue_basic(void) {
+    os_message_queue_t test_q;
+    uint32_t test_buffer[4];
+    uint32_t msg_sent = 0xDEADBEEF;
+    uint32_t msg_received = 0;
+
+    uart_print("[POST] Testing Queue... ");
+
+    os_queue_init(&test_q, test_buffer, 4);
+    os_queue_send(&test_q, msg_sent);
+    msg_received = os_queue_receive(&test_q);
+
+    if (msg_received != msg_sent) {
+        uart_print("FAIL: Data mismatch\r\n");
+        while(1);
+    }
+
+    uart_print("PASS\r\n");
+}
+
 void os_run_post(void) {
     uart_print("\r\n--- STARTING KERNEL POST ---\r\n");
     
     test_mutex_basic();
     test_semaphore_basic();
+    test_queue_basic();
     
     uart_print("--- KERNEL READY ---\r\n\r\n");
 }

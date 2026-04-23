@@ -10,7 +10,7 @@
 
 /* Sweep task initialises */
 uint32_t servo_stack[256];
-extern os_message_queue_t sweep_queue;
+os_message_queue_t sweep_queue;
 uint32_t sweep_queue_buffer[8];
 
 
