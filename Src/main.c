@@ -5,18 +5,37 @@
 #include "tasks.h"
 #include "uart.h"
 #include "Bench/microbench.h"
+#include "Drivers/Inc/servo.h"
+#include "os_queue.h"
+
+/* Sweep task initialises */
+uint32_t servo_stack[256];
+extern os_message_queue_t sweep_queue;
+uint32_t sweep_queue_buffer[8];
+
 
 int main(void)
 {
-    /* Initialize the microbenchmark suite (enables DWT counter and UART) */
-    microbench_init();
-    
-    uart_print("--- SENTINEL MICROBENCH START ---\r\n");
+    /* Initialize Kernel */
+    os_kernel_init();
 
-    /* Run the Mutex Overhead Benchmark */
-    bench_mutex_overhead();
+    /* Initialize UART */
+    uart_init();
+    uart_print("--- SENTINEL RTOS BOOTING ---\r\n");
 
-    uart_print("--- BENCHMARK COMPLETE ---\r\n");
+    /* Run Power-On Self-Tests */
+    os_run_post();
 
-    while(1){}; /* End of benchmark */
+    /* Initialize Peripherals */
+    servo_init();
+    /* Initialise queue with mem buf and capacity */
+    os_queue_init(&sweep_queue, sweep_queue_buffer, 8);
+
+    /* Create Tasks */
+    os_task_create(sweep_task, &servo_stack[0], 1);
+
+    /* Launch the kernel */
+    os_kernel_launch();
+
+    while(1){}; /* DONT REACH HERE! */
 }

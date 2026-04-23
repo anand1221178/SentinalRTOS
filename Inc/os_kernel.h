@@ -30,7 +30,7 @@ typedef struct
     uint8_t wait_count; /* How many tasks are currently waiting? */
 } os_mutex_t;
 
-typedef struct os_semaphore
+typedef struct
 {
     uint32_t count; /* Current number of avaliable tokens */
     uint32_t max_count; /* 1 for Binary, >1 for Counting */
