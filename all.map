@@ -1,0 +1,387 @@
+Archive member included to satisfy reference by file (symbol)
+
+/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memset.o)
+                              os_queue.o (memset)
+
+There are no discarded input sections
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x08000000         0x00080000         xr
+SRAM             0x20000000         0x00018000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD main.o
+LOAD os_kernel.o
+LOAD os_kernel_asm.o
+LOAD os_tests.o
+LOAD os_queue.o
+LOAD tasks.o
+LOAD stm32f411_startup.o
+LOAD uart.o
+LOAD microbench.o
+LOAD servo.o
+START GROUP
+LOAD /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m/nofp/libgcc.a
+LOAD /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+END GROUP
+START GROUP
+LOAD /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m/nofp/libgcc.a
+LOAD /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+LOAD /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libnosys.a
+END GROUP
+START GROUP
+LOAD /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/thumb/v7e-m/nofp/libgcc.a
+LOAD /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a
+LOAD /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libnosys.a
+END GROUP
+                0x20018000                        _estack = (ORIGIN (SRAM) + LENGTH (SRAM))
+                0x00000200                        __max_heap_size = 0x200
+                0x00000400                        __max_stack_size = 0x400
+
+.text           0x08000000     0x134c
+                0x08000000                        . = ALIGN (0x4)
+ *(.isr_vector_tbl)
+ .isr_vector_tbl
+                0x08000000      0x198 stm32f411_startup.o
+                0x08000000                vector_tbl
+ *(.text)
+ .text          0x08000198       0x84 main.o
+                0x08000198                main
+ .text          0x0800021c      0x5c4 os_kernel.o
+                0x0800021c                os_task_init_stack
+                0x080002c4                os_task_create
+                0x08000364                os_scheduler
+                0x08000404                SysTick_Handler
+                0x080004d8                os_delay
+                0x08000518                os_kernel_init
+                0x0800054c                os_kernel_launch
+                0x0800057c                os_mutex_acquire
+                0x0800061c                os_mutex_release
+                0x080006bc                os_semaphore_acquire
+                0x08000744                os_semaphore_release
+ .text          0x080007e0       0x70 os_kernel_asm.o
+                0x080007e0                os_kernel_launch_asm
+                0x080007f4                PendSV_Handler
+                0x0800081c                os_start_first_task
+ .text          0x08000850      0x190 os_tests.o
+                0x080009b8                os_run_post
+ .text          0x080009e0      0x1aa os_queue.o
+                0x080009e0                os_queue_init
+                0x08000a48                os_queue_send
+                0x08000b14                os_queue_receive
+ *fill*         0x08000b8a        0x2 
+ .text          0x08000b8c      0x198 tasks.o
+                0x08000b8c                os_idle_task
+                0x08000b94                sweep_task
+                0x08000c48                hardware_delay_us
+                0x08000c78                radar_task
+ .text          0x08000d24       0x98 stm32f411_startup.o
+                0x08000d24                DMA1_Stream3_IRQHandler
+                0x08000d24                EXTI2_IRQHandler
+                0x08000d24                DebugMon_Handler
+                0x08000d24                SPI4_IRQHandler
+                0x08000d24                TIM1_CC_IRQHandler
+                0x08000d24                DMA2_Stream5_IRQHandler
+                0x08000d24                HardFault_Handler
+                0x08000d24                DMA1_Stream5_IRQHandler
+                0x08000d24                PVD_IRQHandler
+                0x08000d24                SDIO_IRQHandler
+                0x08000d24                TAMP_STAMP_IRQHandler
+                0x08000d24                NMI_Handler
+                0x08000d24                EXTI3_IRQHandler
+                0x08000d24                TIM1_UP_TIM10_IRQHandler
+                0x08000d24                I2C3_ER_IRQHandler
+                0x08000d24                EXTI0_IRQHandler
+                0x08000d24                I2C2_EV_IRQHandler
+                0x08000d24                DMA1_Stream2_IRQHandler
+                0x08000d24                FPU_IRQHandler
+                0x08000d24                UsageFault_Handler
+                0x08000d24                DMA2_Stream2_IRQHandler
+                0x08000d24                SPI1_IRQHandler
+                0x08000d24                TIM1_BRK_TIM9_IRQHandler
+                0x08000d24                DMA2_Stream3_IRQHandler
+                0x08000d24                USART6_IRQHandler
+                0x08000d24                RTC_Alarm_IRQHandler
+                0x08000d24                DMA2_Stream0_IRQHandler
+                0x08000d24                TIM4_IRQHandler
+                0x08000d24                I2C1_EV_IRQHandler
+                0x08000d24                DMA1_Stream6_IRQHandler
+                0x08000d24                DMA1_Stream1_IRQHandler
+                0x08000d24                TIM3_IRQHandler
+                0x08000d24                RCC_IRQHandler
+                0x08000d24                Default_Handler
+                0x08000d24                EXTI15_10_IRQHandler
+                0x08000d24                ADC_IRQHandler
+                0x08000d24                DMA1_Stream7_IRQHandler
+                0x08000d24                SPI5_IRQHandler
+                0x08000d24                TIM5_IRQHandler
+                0x08000d24                DMA2_Stream7_IRQHandler
+                0x08000d24                I2C3_EV_IRQHandler
+                0x08000d24                EXTI9_5_IRQHandler
+                0x08000d24                RTC_WKUP_IRQHandler
+                0x08000d24                SPI2_IRQHandler
+                0x08000d24                MemManage_Handler
+                0x08000d24                DMA1_Stream0_IRQHandler
+                0x08000d24                SVC_Handler
+                0x08000d24                EXTI4_IRQHandler
+                0x08000d24                WWDG_IRQHandler
+                0x08000d24                TIM2_IRQHandler
+                0x08000d24                OTG_FS_WKUP_IRQHandler
+                0x08000d24                TIM1_TRG_COM_TIM11_IRQHandler
+                0x08000d24                EXTI1_IRQHandler
+                0x08000d24                USART2_IRQHandler
+                0x08000d24                I2C2_ER_IRQHandler
+                0x08000d24                DMA2_Stream1_IRQHandler
+                0x08000d24                FLASH_IRQHandler
+                0x08000d24                DMA2_Stream4_IRQHandler
+                0x08000d24                BusFault_Handler
+                0x08000d24                USART1_IRQHandler
+                0x08000d24                OTG_FS_IRQHandler
+                0x08000d24                SPI3_IRQHandler
+                0x08000d24                DMA1_Stream4_IRQHandler
+                0x08000d24                I2C1_ER_IRQHandler
+                0x08000d24                DMA2_Stream6_IRQHandler
+                0x08000d2a                Reset_Handler
+ .text          0x08000dbc      0x1f0 uart.o
+                0x08000dbc                __io_putchar
+                0x08000dec                uart_init
+                0x08000f00                uart_print
+                0x08000f2a                uart_print_number
+ .text          0x08000fac       0xa8 microbench.o
+                0x08000fac                microbench_init
+                0x08000fe0                bench_mutex_overhead
+ .text          0x08001054      0x124 servo.o
+                0x08001054                servo_init
+                0x0800112c                servo_set_angle
+ .text          0x08001178        0x0 /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memset.o)
+ *(.rodata)
+ .rodata        0x08001178       0x20 main.o
+ .rodata        0x08001198      0x129 os_tests.o
+ *fill*         0x080012c1        0x3 
+ .rodata        0x080012c4       0x56 tasks.o
+ *fill*         0x0800131a        0x2 
+ .rodata        0x0800131c        0x2 uart.o
+ *fill*         0x0800131e        0x2 
+ .rodata        0x08001320       0x2b microbench.o
+                0x0800134c                        . = ALIGN (0x4)
+ *fill*         0x0800134b        0x1 
+                0x0800134c                        _etext = .
+
+.glue_7         0x0800134c        0x0
+ .glue_7        0x0800134c        0x0 linker stubs
+
+.glue_7t        0x0800134c        0x0
+ .glue_7t       0x0800134c        0x0 linker stubs
+
+.vfp11_veneer   0x0800134c        0x0
+ .vfp11_veneer  0x0800134c        0x0 linker stubs
+
+.v4_bx          0x0800134c        0x0
+ .v4_bx         0x0800134c        0x0 linker stubs
+
+.iplt           0x0800134c        0x0
+ .iplt          0x0800134c        0x0 main.o
+
+.text.memset    0x0800134c       0x10
+ .text.memset   0x0800134c       0x10 /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memset.o)
+                0x0800134c                memset
+
+.rel.dyn        0x0800135c        0x0
+ .rel.iplt      0x0800135c        0x0 main.o
+
+.data           0x20000000        0x0 load address 0x0800135c
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _sdata = .
+ *(.data)
+ .data          0x20000000        0x0 main.o
+ .data          0x20000000        0x0 os_kernel.o
+ .data          0x20000000        0x0 os_kernel_asm.o
+ .data          0x20000000        0x0 os_tests.o
+ .data          0x20000000        0x0 os_queue.o
+ .data          0x20000000        0x0 tasks.o
+ .data          0x20000000        0x0 stm32f411_startup.o
+ .data          0x20000000        0x0 uart.o
+ .data          0x20000000        0x0 microbench.o
+ .data          0x20000000        0x0 servo.o
+ .data          0x20000000        0x0 /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memset.o)
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _edata = .
+
+.igot.plt       0x20000000        0x0 load address 0x0800135c
+ .igot.plt      0x20000000        0x0 main.o
+
+.bss            0x20000000      0xd5c load address 0x0800135c
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _sbss = .
+ *(.bss)
+ .bss           0x20000000      0xcc4 main.o
+                0x20000000                servo_stack
+                0x20000400                radar_stack
+                0x20000800                idle_stack
+                0x20000c00                sweep_queue
+                0x20000c78                sweep_queue_buffer
+                0x20000c98                echo_ready
+                0x20000cbc                time_start
+                0x20000cc0                time_end
+ .bss           0x20000cc4       0x98 os_kernel.o
+                0x20000cc4                os_tasks
+                0x20000d58                current_tcb
+ .bss           0x20000d5c        0x0 os_kernel_asm.o
+ .bss           0x20000d5c        0x0 os_tests.o
+ .bss           0x20000d5c        0x0 os_queue.o
+ .bss           0x20000d5c        0x0 tasks.o
+ .bss           0x20000d5c        0x0 stm32f411_startup.o
+ .bss           0x20000d5c        0x0 uart.o
+ .bss           0x20000d5c        0x0 microbench.o
+ .bss           0x20000d5c        0x0 servo.o
+ .bss           0x20000d5c        0x0 /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memset.o)
+                0x20000d5c                        . = ALIGN (0x4)
+                0x20000d5c                        _ebss = .
+OUTPUT(all.elf elf32-littlearm)
+LOAD linker stubs
+
+.debug_info     0x00000000     0x2792
+ .debug_info    0x00000000      0x418 main.o
+ .debug_info    0x00000418      0x7ea os_kernel.o
+ .debug_info    0x00000c02       0x24 os_kernel_asm.o
+ .debug_info    0x00000c26      0x420 os_tests.o
+ .debug_info    0x00001046      0x3b2 os_queue.o
+ .debug_info    0x000013f8      0x50e tasks.o
+ .debug_info    0x00001906      0x184 stm32f411_startup.o
+ .debug_info    0x00001a8a      0x498 uart.o
+ .debug_info    0x00001f22      0x423 microbench.o
+ .debug_info    0x00002345      0x44d servo.o
+
+.debug_abbrev   0x00000000      0xcbf
+ .debug_abbrev  0x00000000      0x163 main.o
+ .debug_abbrev  0x00000163      0x21b os_kernel.o
+ .debug_abbrev  0x0000037e       0x14 os_kernel_asm.o
+ .debug_abbrev  0x00000392      0x13c os_tests.o
+ .debug_abbrev  0x000004ce      0x136 os_queue.o
+ .debug_abbrev  0x00000604      0x1cd tasks.o
+ .debug_abbrev  0x000007d1       0xfe stm32f411_startup.o
+ .debug_abbrev  0x000008cf      0x18e uart.o
+ .debug_abbrev  0x00000a5d      0x172 microbench.o
+ .debug_abbrev  0x00000bcf       0xf0 servo.o
+
+.debug_aranges  0x00000000      0x140
+ .debug_aranges
+                0x00000000       0x20 main.o
+ .debug_aranges
+                0x00000020       0x20 os_kernel.o
+ .debug_aranges
+                0x00000040       0x20 os_kernel_asm.o
+ .debug_aranges
+                0x00000060       0x20 os_tests.o
+ .debug_aranges
+                0x00000080       0x20 os_queue.o
+ .debug_aranges
+                0x000000a0       0x20 tasks.o
+ .debug_aranges
+                0x000000c0       0x20 stm32f411_startup.o
+ .debug_aranges
+                0x000000e0       0x20 uart.o
+ .debug_aranges
+                0x00000100       0x20 microbench.o
+ .debug_aranges
+                0x00000120       0x20 servo.o
+
+.debug_line     0x00000000     0x147b
+ .debug_line    0x00000000      0x189 main.o
+ .debug_line    0x00000189      0x503 os_kernel.o
+ .debug_line    0x0000068c       0x71 os_kernel_asm.o
+ .debug_line    0x000006fd      0x1e4 os_tests.o
+ .debug_line    0x000008e1      0x1df os_queue.o
+ .debug_line    0x00000ac0      0x25b tasks.o
+ .debug_line    0x00000d1b      0x170 stm32f411_startup.o
+ .debug_line    0x00000e8b      0x253 uart.o
+ .debug_line    0x000010de      0x1ac microbench.o
+ .debug_line    0x0000128a      0x1f1 servo.o
+
+.debug_str      0x00000000      0xa11
+ .debug_str     0x00000000      0xa11 main.o
+                                0x366 (size before relaxing)
+ .debug_str     0x00000a11        0x0 os_kernel.o
+                                0x417 (size before relaxing)
+ .debug_str     0x00000a11        0x0 os_kernel_asm.o
+                                 0x57 (size before relaxing)
+ .debug_str     0x00000a11        0x0 os_tests.o
+                                0x379 (size before relaxing)
+ .debug_str     0x00000a11        0x0 os_queue.o
+                                0x303 (size before relaxing)
+ .debug_str     0x00000a11        0x0 tasks.o
+                                0x3c9 (size before relaxing)
+ .debug_str     0x00000a11        0x0 stm32f411_startup.o
+                                0x1c8 (size before relaxing)
+ .debug_str     0x00000a11        0x0 uart.o
+                                0x32c (size before relaxing)
+ .debug_str     0x00000a11        0x0 microbench.o
+                                0x398 (size before relaxing)
+ .debug_str     0x00000a11        0x0 servo.o
+                                0x31d (size before relaxing)
+
+.comment        0x00000000       0x45
+ .comment       0x00000000       0x45 main.o
+                                 0x46 (size before relaxing)
+ .comment       0x00000045        0x0 os_kernel.o
+                                 0x46 (size before relaxing)
+ .comment       0x00000045        0x0 os_tests.o
+                                 0x46 (size before relaxing)
+ .comment       0x00000045        0x0 os_queue.o
+                                 0x46 (size before relaxing)
+ .comment       0x00000045        0x0 tasks.o
+                                 0x46 (size before relaxing)
+ .comment       0x00000045        0x0 stm32f411_startup.o
+                                 0x46 (size before relaxing)
+ .comment       0x00000045        0x0 uart.o
+                                 0x46 (size before relaxing)
+ .comment       0x00000045        0x0 microbench.o
+                                 0x46 (size before relaxing)
+ .comment       0x00000045        0x0 servo.o
+                                 0x46 (size before relaxing)
+
+.ARM.attributes
+                0x00000000       0x2c
+ .ARM.attributes
+                0x00000000       0x2e main.o
+ .ARM.attributes
+                0x0000002e       0x2e os_kernel.o
+ .ARM.attributes
+                0x0000005c       0x1c os_kernel_asm.o
+ .ARM.attributes
+                0x00000078       0x2e os_tests.o
+ .ARM.attributes
+                0x000000a6       0x2e os_queue.o
+ .ARM.attributes
+                0x000000d4       0x2e tasks.o
+ .ARM.attributes
+                0x00000102       0x2e stm32f411_startup.o
+ .ARM.attributes
+                0x00000130       0x2e uart.o
+ .ARM.attributes
+                0x0000015e       0x2e microbench.o
+ .ARM.attributes
+                0x0000018c       0x2e servo.o
+ .ARM.attributes
+                0x000001ba       0x2e /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memset.o)
+
+.debug_frame    0x00000000      0x5a0
+ .debug_frame   0x00000000       0x2c main.o
+ .debug_frame   0x0000002c      0x1b0 os_kernel.o
+ .debug_frame   0x000001dc       0x98 os_tests.o
+ .debug_frame   0x00000274       0x7c os_queue.o
+ .debug_frame   0x000002f0       0x90 tasks.o
+ .debug_frame   0x00000380       0x4c stm32f411_startup.o
+ .debug_frame   0x000003cc      0x10c uart.o
+ .debug_frame   0x000004d8       0x50 microbench.o
+ .debug_frame   0x00000528       0x58 servo.o
+ .debug_frame   0x00000580       0x20 /Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.2.1/../../../../arm-none-eabi/lib/thumb/v7e-m/nofp/libc_nano.a(libc_a-memset.o)
+
+.debug_line_str
+                0x00000000       0x49
+ .debug_line_str
+                0x00000000       0x49 os_kernel_asm.o

@@ -22,39 +22,59 @@ void os_queue_init(os_message_queue_t *q, uint32_t *buffer_array, uint32_t capac
     q->filled_slots = (os_semaphore_t){0, capacity, {NULL}, 0};
 }
 
-void os_queue_send(os_message_queue_t *q, uint32_t message) 
+uint8_t os_queue_send(os_message_queue_t *q, uint32_t message, uint32_t timeout) 
 {
-    /* Wait till there is atelast 1 empty slot */
-    os_semaphore_acquire(&q->empty_slots);
+    /* Try to grab an empty slot without blocking (Timeout = 0) */
+    if (os_semaphore_acquire(&q->empty_slots, 0) == OS_SUCCESS)
+    {
+        /* NORMAL SEND: We have space! */
+        os_mutex_acquire(&q->lock, WAIT_FOREVER);
+        
+        /* Write data and advance head */
+        q->buffer[q->head] = message;
+        q->head = (q->head + 1) % q->capacity;
+        
+        os_mutex_release(&q->lock);
+        
+        /* Signal consumer that a new slot is filled */
+        os_semaphore_release(&q->filled_slots);
+    }
+    else
+    {
+        /* OVERWRITE: Queue is full! (Timeout hit instantly) */
+        os_mutex_acquire(&q->lock, WAIT_FOREVER);
+        
+        /* 1. Overwrite the absolute oldest data */
+        q->buffer[q->head] = message;
+        
+        /* 2. Advance BOTH head and tail to maintain the ring */
+        q->head = (q->head + 1) % q->capacity;
+        q->tail = (q->tail + 1) % q->capacity; 
+        
+        os_mutex_release(&q->lock);
+        
+        /* We DO NOT release filled_slots here because the total 
+           number of filled slots hasn't changed (it's still at max capacity). */
+    }
+    
+    return OS_SUCCESS;
+}   
 
-    /* lock mem so we can edit it and make sure no dual edits */
-    os_mutex_acquire(&q->lock);
-
-    /* Write the data -> RING BUFFER LOGIC */
-    q->buffer[q->head] = message;
-
-    /* Advance the head pointer and wrap around if it hits capacity */
-    q->head = (q->head + 1) % q->capacity;
-
-    /* unlock mem */
-    os_mutex_release(&q->lock);
-
-    //Signal to the Consumer that there is 1 new filled slot */
-    os_semaphore_release(&q->filled_slots);
-}
-
-uint32_t os_queue_receive(os_message_queue_t *q)
+uint8_t os_queue_receive(os_message_queue_t *q, uint32_t *buffer, uint32_t timeout)
 {
-    uint32_t message;
 
     /* Wait till there is at least one filled slot */
-    os_semaphore_acquire(&q->filled_slots);
+    if (os_semaphore_acquire(&q->filled_slots, timeout) == OS_TIMEOUT)
+    {
+        return OS_TIMEOUT; /* Do not touch the mutex*/
+    }
+    
 
     /* lock memory */
-    os_mutex_acquire(&q->lock);
+    os_mutex_acquire(&q->lock, timeout);
 
     /* Read the data */
-    message = q->buffer[q->tail];
+    *buffer = q->buffer[q->tail];
     q->tail = (q->tail + 1) % q->capacity;
 
     /* unlock mem */
@@ -63,5 +83,5 @@ uint32_t os_queue_receive(os_message_queue_t *q)
     /* Signal to producer that 1 new empty slotis avalibale */
     os_semaphore_release(&q->empty_slots);
 
-    return message;
+    return OS_SUCCESS;
 }

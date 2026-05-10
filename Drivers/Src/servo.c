@@ -3,18 +3,17 @@
 #include "uart.h"
 #include "os_queue.h"
 
-extern os_message_queue_t sweep_queue;
-
 void servo_init(void)
 {
-    /* Enable clock acess to gipia  and TIM3*/
+    /* Enable clock access to GPIOA and TIM3 */
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
     RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;
 
-    /* FOnciggure PA6 for alternate function (AF2 = TIM3_CH1) so set bits 27-24 to 0010*/
-    /* THis sets PA6 to AF mode */
+    /* Configure PA6 for alternate function (AF2 = TIM3_CH1) so set bits 27-24 to 0010*/
+    /* This sets PA6 to AF mode */
     GPIOA->MODER |= (1U<<13); /* Set 13 to 1 */ 
     GPIOA->MODER &=~(1U<<12); /* Set 12 to 0 */
+    
     /* Set the AF mode of PA6 to 0010 for TIM3 */
     GPIOA->AFR[0] &=~(1U<<27);
     GPIOA->AFR[0] &=~(1U<<26);
@@ -47,8 +46,6 @@ void servo_init(void)
     /* Enable Timer 3 Counter */
     /* The Counter Enable (CEN) is bit 0 in the Control Register 1 (CR1). */
     TIM3->CR1 |=    (1U << 0); /* Set bit 0 to 1 */
-
-    
 }
 
 /* Since i have never worked with the SG90 servo motor this is what the big GEMINI had to say:
@@ -74,55 +71,11 @@ void servo_set_angle(uint16_t degrees)
         degrees = 180;
     }
 
-    /* * Map 0-180 degrees to 1000-2000 microseconds:
+    /* Map 0-180 degrees to 1000-2000 microseconds:
      * Pulse Width = 1000 + ( (degrees * 1000) / 180 )
      */
     uint32_t pulse_width_us = 1000 + ((degrees * 1000) / 180);
 
     /* Update the hardware register to change the duty cycle immediately */
     TIM3->CCR1 = pulse_width_us;
-}
-
-void sweep_task(void)
-{
-    /* Homing phase to get the servo motor to a known angle */
-    servo_set_angle(0);
-    os_delay(500);
-
-    int16_t current_angle = 0;
-    int16_t step = 1;
-
-    /* Main loop -> runs forver at 50hz */
-    while(1)
-    {
-        /* Update the hardware */
-        servo_set_angle(current_angle);
-
-        /*Broadcast the angle to the rest of the OS safely */
-        os_queue_send(&sweep_queue, (uint32_t)current_angle);
-
-        /* Print every 10 degrees to verify timing and logic */
-        if (current_angle % 10 == 0) {
-            uart_print("[Servo] Angle: ");
-            uart_print_number(current_angle);
-            uart_print(" | Step: ");
-            if (step > 0) uart_print("+1\r\n");
-            else uart_print("-1\r\n");
-        }
-        
-        /* Calculate the next position */
-        current_angle = current_angle + step;
-        
-        /* Check boundaries and reverse direction if needed */
-        if (current_angle >= 180 && step == +1) 
-        {
-            step = -1; 
-        }
-        else if ( current_angle <= 0 && step == -1) 
-        {
-            step = 1; 
-        }
-        
-        os_delay(20);
-    }
 }

@@ -22,7 +22,7 @@ void bench_mutex_overhead(void)
     start_time = DWT->CYCCNT; /* Get the starting cycle count */
 
     /* Execute (Measuring an uncontested acquire and release) */
-    os_mutex_acquire(&bench_mutex);
+    os_mutex_acquire(&bench_mutex, 0);
     os_mutex_release(&bench_mutex);
 
     /* Stop and calculate */

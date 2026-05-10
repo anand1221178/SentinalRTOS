@@ -9,7 +9,7 @@ static void test_mutex_basic(void) {
     
     uart_print("[POST] Testing Mutex... ");
     
-    os_mutex_acquire(&test_mutex);
+    os_mutex_acquire(&test_mutex, WAIT_FOREVER);
     if (test_mutex.lock != 1) {
         uart_print("FAIL: Lock not set\r\n");
         while(1);
@@ -32,13 +32,13 @@ static void test_semaphore_basic(void) {
     
     uart_print("[POST] Testing Semaphore... ");
     
-    os_semaphore_acquire(&test_sem);
+    os_semaphore_acquire(&test_sem, WAIT_FOREVER);
     if (test_sem.count != 1) {
         uart_print("FAIL: Count not 1\r\n");
         while(1);
     }
     
-    os_semaphore_acquire(&test_sem);
+    os_semaphore_acquire(&test_sem, WAIT_FOREVER);
     if (test_sem.count != 0) {
         uart_print("FAIL: Count not 0\r\n");
         while(1);
@@ -64,8 +64,8 @@ static void test_queue_basic(void) {
     uart_print("[POST] Testing Queue... ");
 
     os_queue_init(&test_q, test_buffer, 4);
-    os_queue_send(&test_q, msg_sent);
-    msg_received = os_queue_receive(&test_q);
+    os_queue_send(&test_q, msg_sent, WAIT_FOREVER);
+    os_queue_receive(&test_q, &msg_received, WAIT_FOREVER);
 
     if (msg_received != msg_sent) {
         uart_print("FAIL: Data mismatch\r\n");

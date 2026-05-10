@@ -8,11 +8,19 @@
 #include "Drivers/Inc/servo.h"
 #include "os_queue.h"
 
-/* Sweep task initialises */
+/* Task Stacks */
 uint32_t servo_stack[256];
+uint32_t radar_stack[256];
+uint32_t idle_stack[256];
+
+/* Queue Resources */
 os_message_queue_t sweep_queue;
 uint32_t sweep_queue_buffer[8];
 
+/* Ultrasonic Resources */
+os_semaphore_t echo_ready;
+volatile uint32_t time_start = 0;
+volatile uint32_t time_end = 0;
 
 int main(void)
 {
@@ -28,11 +36,19 @@ int main(void)
 
     /* Initialize Peripherals */
     servo_init();
-    /* Initialise queue with mem buf and capacity */
+    
+    /* Initialize Synchronization Primitives */
     os_queue_init(&sweep_queue, sweep_queue_buffer, 8);
+    
+    /* Binary semaphore for Ultrasonic (starts at 0) */
+    echo_ready.count = 0;
+    echo_ready.max_count = 1;
+    echo_ready.wait_count = 0;
 
     /* Create Tasks */
-    os_task_create(sweep_task, &servo_stack[0], 1);
+    os_task_create(sweep_task, servo_stack, 1);
+    os_task_create(radar_task, radar_stack, 1);
+    os_task_create(os_idle_task, idle_stack, 0);
 
     /* Launch the kernel */
     os_kernel_launch();

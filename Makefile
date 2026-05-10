@@ -51,8 +51,10 @@ all.elf: main.o os_kernel.o os_kernel_asm.o os_tests.o os_queue.o tasks.o stm32f
 
 flash:
 	arm-none-eabi-gdb -batch \
+	all.elf \
 	-ex "target remote localhost:3333" \
-	-ex "monitor reset init" \
+	-ex "monitor halt" \
+	-ex "monitor reset halt" \
 	-ex "monitor flash write_image erase all.elf" \
 	-ex "monitor reset halt" \
 	-ex "monitor resume"

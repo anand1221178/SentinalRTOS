@@ -2,7 +2,7 @@
 #define __OS_QUEUE_H__
 
 #include <stdint.h>
-#include "os_kernel.h" // Assuming this is where os_mutex_t and os_semaphore_t live
+#include "os_kernel.h"
 
 typedef struct {
     uint32_t *buffer;             /* Pointer to the actual array in memory */
@@ -16,7 +16,7 @@ typedef struct {
 } os_message_queue_t;
 
 void os_queue_init(os_message_queue_t *q, uint32_t *buffer_array, uint32_t capacity);
-void os_queue_send(os_message_queue_t *q, uint32_t message);
-uint32_t os_queue_receive(os_message_queue_t *q);
+uint8_t os_queue_send(os_message_queue_t *q, uint32_t message, uint32_t timeout);
+uint8_t os_queue_receive(os_message_queue_t *q, uint32_t *buffer, uint32_t timeout);
 
 #endif

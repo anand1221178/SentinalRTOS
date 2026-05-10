@@ -17,6 +17,10 @@
 
 #define SYSTICK_CTRL_CONFIG  (ST_ENABLE | ST_TICKINT | ST_CLKSOURCE)
 
+#define OS_SUCCESS 0
+#define OS_TIMEOUT 1
+#define OS_FAIL    2
+#define WAIT_FOREVER 0xFFFFFFFF
 
 /* --- Synchronization Primitives Definitions --- */
 
@@ -79,11 +83,11 @@ bool os_task_create(void (*taskptr)(void), uint32_t *stackLimit, uint8_t priorit
 void os_scheduler(void);
 
 /* Mutex API */
-void os_mutex_acquire(os_mutex_t* mutex);
+uint8_t os_mutex_acquire(os_mutex_t* mutex, uint32_t timeout);
 void os_mutex_release(os_mutex_t* mutex);
 
 /* Semaphore API */
-void os_semaphore_acquire(os_semaphore_t* sem);
+uint8_t os_semaphore_acquire(os_semaphore_t* sem, uint32_t timeout);
 void os_semaphore_release(os_semaphore_t* sem);
 
 void os_delay(uint32_t ms);
